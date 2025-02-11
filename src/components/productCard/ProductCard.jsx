@@ -1,19 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import './ProductCard.css';
-import { Card, Typography, Rate, Row, Col, Image } from "antd";
+import { Card, Typography, Rate, Row, Col, Image, List, Button } from "antd";
 
 const { Title, Text } = Typography;
 
 export default function ProductCard({ product }) {
+  const [showReviews, setShowReviews] = useState(false);
+
   return (
     <Card className="max-w-3xl mx-auto p-4 shadow-md product-card" bordered>
       <Row gutter={16}>
         <Col xs={24} md={8} className="flex justify-center">
           <Image
-            src={product?.images}
+            src={product?.images[0]}
             alt={product?.title}
             width={'100%'}
-            height={300}
+            height={400}
             objectFit="cover"
           />
         </Col>
@@ -36,8 +38,8 @@ export default function ProductCard({ product }) {
             <Col span={12}><Text strong className="blue-text">Return policy:</Text> {product?.returnPolicy}</Col>
             <Col span={12}><Text strong className="blue-text">Minimum Order Quantity:</Text> {product?.minimumOrderQuantity}</Col>
             <Col span={12}><Text strong className="blue-text">BarCode:</Text> {product?.meta.barcode}</Col>
-            <Col span={12}><Text strong className="blue-text">Create at:</Text> {product?.meta.createdAt}</Col>
-            <Col span={12}><Text strong className="blue-text">Last update:</Text> {product?.meta.updatedAt}</Col>
+            <Col span={12}><Text strong className="blue-text">Create at:</Text> {new Date(product?.meta.createdAt).toLocaleDateString()}</Col>
+            <Col span={12}><Text strong className="blue-text">Last update:</Text> {new Date(product?.meta.updatedAt).toLocaleDateString()}</Col>
             <Col span={12} className={product?.availabilityStatus === 'Low Stock' ? 'red-text' : 'green-text'}><Text strong className='blue-text'>Status:</Text> {product?.availabilityStatus}</Col>
           </Row>
           <Row justify="end" className="mt-4">
@@ -51,8 +53,34 @@ export default function ProductCard({ product }) {
               />
             </Col>
           </Row>
+          <Row justify="start" className="mt-4">
+            <Button className="showReview" onClick={() => setShowReviews(!showReviews)}>
+              {showReviews ? "Hide Reviews" : "Show Reviews"}
+            </Button>
+          </Row>
         </Col>
       </Row>
+      {showReviews && (
+        <Row className="mt-4">
+          <Col span={24}>
+            <Title level={4} className="blue-text">Reviews</Title>
+            <List
+              itemLayout="vertical"
+              dataSource={product?.reviews}
+              renderItem={review => (
+                <List.Item>
+                  <List.Item.Meta
+                    title={<Text strong>{review.reviewerName}</Text>}
+                    description={<Text type="secondary">{new Date(review.date).toLocaleDateString()}</Text>}
+                  />
+                  <Row><Rate allowHalf defaultValue={review.rating} disabled /></Row>
+                  <Text className="block mt-1">{review.comment}</Text>
+                </List.Item>
+              )}
+            />
+          </Col>
+        </Row>
+      )}
     </Card>
   );
 }

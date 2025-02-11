@@ -51,7 +51,7 @@ function App() {
 
   const lastProductRef = useCallback(
     (node) => {
-      if (loading) return;
+      if (loading || searchQuery) return;
       if (observerRef.current) observerRef.current.disconnect();
 
       observerRef.current = new IntersectionObserver(entries => {
@@ -62,7 +62,7 @@ function App() {
 
       if (node) observerRef.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore, searchQuery]
   );
 
   const debouncedSearch = useCallback(
